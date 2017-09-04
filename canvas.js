@@ -4,6 +4,23 @@ var c = canvas.getContext("2d") ;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+
+var mouse = {
+    x : undefined,
+    y : undefined
+};
+
+var maxRadius = 100 ;
+var minRadius = 10 ;
+var affectedCirclesSpace = 100 ;
+var colorArray = [ "#ffaa33" , "#99ffaa" , "#00ff00" , "#4411aa" , "#ff1100" ];
+
+window.addEventListener("mousemove",function( e ) {
+    // get mouse position
+    mouse.x = e.x ;
+    mouse.y = e.y ;
+});
+
 // if using es6 we can say class and generate instances from it but now lets stick with object oriented es5
 function circle( x , y , dx , dy , radius ) {
     this.x = x ;
@@ -11,13 +28,14 @@ function circle( x , y , dx , dy , radius ) {
     this.dx = dx ;
     this.dy = dy ;
     this.radius = radius ;
+    this.minRadius = radius ;
+    this.color = colorArray[ Math.floor( Math.random() * colorArray.length )] ;
 
     this.draw = function() {
         c.beginPath();
         c.arc( this.x , this.y ,this.radius, 0 ,Math.PI * 2 ,false ) ;
-        c.strokeStyle = "blue" ;
+        c.fillStyle = this.color ;
         c.fill();
-        c.stroke();
     }
 
     this.update = function() {
@@ -32,6 +50,22 @@ function circle( x , y , dx , dy , radius ) {
         this.x += this.dx;
         this.y += this.dy;
 
+        // lets add interactivity here
+        if(
+            ( mouse.x - this.x ) < affectedCirclesSpace &&
+            ( mouse.x - this.x ) > -affectedCirclesSpace &&
+            ( mouse.y - this.y ) < affectedCirclesSpace &&
+            ( mouse.y - this.y ) > -affectedCirclesSpace
+        ){
+            // circle so close to mouse x position
+            // do not increase radius until it's less than 40
+            if( this.radius < maxRadius ){
+                this.radius += 1 ;
+            }
+        }else if( this.radius > this.minRadius ){
+            this.radius -= 1 ;
+        }
+
         this.draw();
     }
 
@@ -39,13 +73,13 @@ function circle( x , y , dx , dy , radius ) {
 
 var circleArray = [] ;
 
-for( var i = 0 ; i < 100 ; i++ )
+for( var i = 0 ; i < 1000 ; i++ )
 {
-    var radius = 30 ;
+    var radius = ( Math.random() * 20 ) + 1  ;
     var x = Math.random() * ( innerWidth - radius * 2 ) + radius ;
     var y = Math.random() * ( innerHeight - radius * 2 ) + radius ;
-    var dx = ( Math.random() - 0.5 ) * 8 ;
-    var dy = ( Math.random() - 0.5 ) * 8 ;
+    var dx = ( Math.random() - 0.5 ) * 4 ;
+    var dy = ( Math.random() - 0.5 ) * 4 ;
 
     circleArray.push( new circle( x , y , dx , dy , radius ) ) ;
 }

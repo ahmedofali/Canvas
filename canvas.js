@@ -52,7 +52,7 @@ for( var i = 0 ; i < 100 ; i++ )
 
 function animateCircles()
 {
-    requestAnimationFrame( animate );
+    requestAnimationFrame( animateCircles );
     c.clearRect( 0 , 0 , innerWidth , innerHeight);
     circleArray.forEach( function( circle ){
         circle.update();

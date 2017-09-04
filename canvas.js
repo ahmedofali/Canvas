@@ -4,29 +4,17 @@ var c = canvas.getContext("2d") ;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-
-var mouse = {
-    x : undefined,
-    y : undefined
+var settings = {
+    maxRadius:100,
+    affectedCirclesSpace:100,
+    colorArray:[ "#225378" , "#1695A3" , "#ACF0F2" , "#F3FFE2" , "#EB7F00" ],
+    numberOfCircles:500,
+    mouse:{
+        x : undefined,
+        y : undefined
+    }
 };
 
-var maxRadius = 100 ;
-var affectedCirclesSpace = 100 ;
-var colorArray = [ "#225378" , "#1695A3" , "#ACF0F2" , "#F3FFE2" , "#EB7F00" ];
-
-// on mouse move
-window.addEventListener("mousemove",function( e ) {
-    // get mouse position
-    mouse.x = e.x ;
-    mouse.y = e.y ;
-});
-
-// on browser window resize
-window.addEventListener("resize",function( e ) {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    init();
-});
 
 // if using es6 we can say class and generate instances from it but now lets stick with object oriented es5
 function circle( x , y , dx , dy , radius ) {
@@ -36,7 +24,7 @@ function circle( x , y , dx , dy , radius ) {
     this.dy = dy ;
     this.radius = radius ;
     this.minRadius = radius ;
-    this.color = colorArray[ Math.floor( Math.random() * colorArray.length )] ;
+    this.color = settings.colorArray[ Math.floor( Math.random() * settings.colorArray.length )] ;
 
     this.draw = function() {
         c.beginPath();
@@ -59,14 +47,14 @@ function circle( x , y , dx , dy , radius ) {
 
         // lets add interactivity here
         if(
-            ( mouse.x - this.x ) < affectedCirclesSpace &&
-            ( mouse.x - this.x ) > -affectedCirclesSpace &&
-            ( mouse.y - this.y ) < affectedCirclesSpace &&
-            ( mouse.y - this.y ) > -affectedCirclesSpace
+            ( settings.mouse.x - this.x ) < settings.affectedCirclesSpace &&
+            ( settings.mouse.x - this.x ) > -settings.affectedCirclesSpace &&
+            ( settings.mouse.y - this.y ) < settings.affectedCirclesSpace &&
+            ( settings.mouse.y - this.y ) > -settings.affectedCirclesSpace
         ){
             // circle so close to mouse x position
             // do not increase radius until it's less than 40
-            if( this.radius < maxRadius ){
+            if( this.radius < settings.maxRadius ){
                 this.radius += 1 ;
             }
         }else if( this.radius > this.minRadius ){
@@ -79,31 +67,56 @@ function circle( x , y , dx , dy , radius ) {
 }
 
 
-var circleArray = [] ;
+function controller(){
 
-function init()
-{
-    circleArray = [] ;
-    for( var i = 0 ; i < 500 ; i++ )
-    {
-        var radius = ( Math.random() * 20 ) + 1  ;
-        var x = Math.random() * ( innerWidth - radius * 2 ) + radius ;
-        var y = Math.random() * ( innerHeight - radius * 2 ) + radius ;
-        var dx = ( Math.random() - 0.5 ) * 4 ;
-        var dy = ( Math.random() - 0.5 ) * 4 ;
+    this.circleArray = [] ;
 
-        circleArray.push( new circle( x , y , dx , dy , radius ) ) ;
+    this.start = function(){
+        this.instantiateEventListeners();
+        this.init();
+        this.animateCircles();
+    }
+
+    this.init = function(){
+        this.circleArray = [] ;
+
+        for( var i = 0 ; i < settings.numberOfCircles ; i++ )
+        {
+            var radius = ( Math.random() * 20 ) + 1  ;
+            var x = Math.random() * ( innerWidth - radius * 2 ) + radius ;
+            var y = Math.random() * ( innerHeight - radius * 2 ) + radius ;
+            var dx = ( Math.random() - 0.5 ) * 4 ;
+            var dy = ( Math.random() - 0.5 ) * 4 ;
+
+            this.circleArray.push( new circle( x , y , dx , dy , radius ) ) ;
+        }
+    }
+
+
+    this.animateCircles = function(){
+        requestAnimationFrame( this.animateCircles.bind( this ) );
+        c.clearRect( 0 , 0 , window.innerWidth , window.innerHeight);
+        this.circleArray.forEach( function( circle ){
+            circle.update();
+        });
+    }
+
+    this.instantiateEventListeners = function(){
+        // on mouse move
+        window.addEventListener("mousemove",function( e ) {
+            // get mouse position
+            settings.mouse.x = e.x ;
+            settings.mouse.y = e.y ;
+        });
+
+        // on browser window resize
+        window.addEventListener("resize",function( e ) {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            init();
+        });
     }
 }
 
-function animateCircles()
-{
-    requestAnimationFrame( animateCircles );
-    c.clearRect( 0 , 0 , innerWidth , innerHeight);
-    circleArray.forEach( function( circle ){
-        circle.update();
-    });
-}
-
-init();
-animateCircles();
+var controller = new controller();
+controller.start();

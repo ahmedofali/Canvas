@@ -13,12 +13,20 @@ var mouse = {
 var maxRadius = 100 ;
 var minRadius = 10 ;
 var affectedCirclesSpace = 100 ;
-var colorArray = [ "#ffaa33" , "#99ffaa" , "#00ff00" , "#4411aa" , "#ff1100" ];
+var colorArray = [ "#225378" , "#1695A3" , "#ACF0F2" , "#F3FFE2" , "#EB7F00" ];
 
+// on mouse move
 window.addEventListener("mousemove",function( e ) {
     // get mouse position
     mouse.x = e.x ;
     mouse.y = e.y ;
+});
+
+// on browser window resize
+window.addEventListener("resize",function( e ) {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    init();
 });
 
 // if using es6 we can say class and generate instances from it but now lets stick with object oriented es5
@@ -71,17 +79,22 @@ function circle( x , y , dx , dy , radius ) {
 
 }
 
+
 var circleArray = [] ;
 
-for( var i = 0 ; i < 1000 ; i++ )
+function init()
 {
-    var radius = ( Math.random() * 20 ) + 1  ;
-    var x = Math.random() * ( innerWidth - radius * 2 ) + radius ;
-    var y = Math.random() * ( innerHeight - radius * 2 ) + radius ;
-    var dx = ( Math.random() - 0.5 ) * 4 ;
-    var dy = ( Math.random() - 0.5 ) * 4 ;
+    circleArray = [] ;
+    for( var i = 0 ; i < 500 ; i++ )
+    {
+        var radius = ( Math.random() * 20 ) + 1  ;
+        var x = Math.random() * ( innerWidth - radius * 2 ) + radius ;
+        var y = Math.random() * ( innerHeight - radius * 2 ) + radius ;
+        var dx = ( Math.random() - 0.5 ) * 4 ;
+        var dy = ( Math.random() - 0.5 ) * 4 ;
 
-    circleArray.push( new circle( x , y , dx , dy , radius ) ) ;
+        circleArray.push( new circle( x , y , dx , dy , radius ) ) ;
+    }
 }
 
 function animateCircles()
@@ -93,4 +106,5 @@ function animateCircles()
     });
 }
 
+init();
 animateCircles();

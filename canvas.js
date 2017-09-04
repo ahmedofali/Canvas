@@ -11,7 +11,6 @@ var mouse = {
 };
 
 var maxRadius = 100 ;
-var minRadius = 10 ;
 var affectedCirclesSpace = 100 ;
 var colorArray = [ "#225378" , "#1695A3" , "#ACF0F2" , "#F3FFE2" , "#EB7F00" ];
 

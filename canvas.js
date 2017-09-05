@@ -15,6 +15,10 @@ var settings = {
     }
 };
 
+var gerRandomColor = function(){
+    return settings.colorArray[ Math.floor( Math.random() * settings.colorArray.length )] ;
+}
+
 
 // if using es6 we can say class and generate instances from it but now lets stick with object oriented es5
 function circle( x , y , dx , dy , radius ) {
@@ -24,13 +28,26 @@ function circle( x , y , dx , dy , radius ) {
     this.dy = dy ;
     this.radius = radius ;
     this.minRadius = radius ;
-    this.color = settings.colorArray[ Math.floor( Math.random() * settings.colorArray.length )] ;
+    this.color = gerRandomColor() ;
 
     this.draw = function() {
         c.beginPath();
         c.arc( this.x , this.y ,this.radius, 0 ,Math.PI * 2 ,false ) ;
         c.fillStyle = this.color ;
         c.fill();
+    }
+
+    this.circleWithinMouseAffectedSpace = function(){
+        if(
+            ( settings.mouse.x - this.x ) < settings.affectedCirclesSpace &&
+            ( settings.mouse.x - this.x ) > -settings.affectedCirclesSpace &&
+            ( settings.mouse.y - this.y ) < settings.affectedCirclesSpace &&
+            ( settings.mouse.y - this.y ) > -settings.affectedCirclesSpace
+        ){
+            return true ;
+        }
+
+        return false ;
     }
 
     this.update = function() {
@@ -46,14 +63,9 @@ function circle( x , y , dx , dy , radius ) {
         this.y += this.dy;
 
         // lets add interactivity here
-        if(
-            ( settings.mouse.x - this.x ) < settings.affectedCirclesSpace &&
-            ( settings.mouse.x - this.x ) > -settings.affectedCirclesSpace &&
-            ( settings.mouse.y - this.y ) < settings.affectedCirclesSpace &&
-            ( settings.mouse.y - this.y ) > -settings.affectedCirclesSpace
-        ){
+        if( this.circleWithinMouseAffectedSpace() ){
             // circle so close to mouse x position
-            // do not increase radius until it's less than 40
+            // do not increase radius until it's less than maxRadius
             if( this.radius < settings.maxRadius ){
                 this.radius += 1 ;
             }
